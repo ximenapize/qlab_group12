@@ -53,16 +53,43 @@ Se volvieron a ejecutar las celdas en orden, desde la que crea `capitales` a par
 
 **1. ¿Qué le pedimos a la IA?**
 
-xx
+En el paso 9 se le pidió a Claude el código para ver qué departamentos tienen más declaratorias de emergencia y cuáles tienen más lluvia, ordenando la tabla final según cada criterio.
 
 **2. ¿Qué nos respondió?**
 
-xx 
+Claude armó una lista de columnas para mostrar solo algunas y las imprimió con `print`:
+
+```python
+columnas = ["departamento", "declaratorias", "prorrogas", "lluvia_total_mm", "dias_lluvia_fuerte"]
+
+# 9.1 Los que tienen más declaratorias y los que tienen más lluvia
+print("Más declaratorias:")
+print(tabla_final.sort_values(["declaratorias", "lluvia_total_mm"], ascending=False)[columnas].head(9), "\n")
+
+print("Más lluvia:")
+print(tabla_final.sort_values("lluvia_total_mm", ascending=False)[columnas].head(5), "\n")
+
+```
 
 **3. ¿Qué estaba mal y cómo nos dimos cuenta?**
 
-xxx
+Al ejecutar la celda, una de las tablas se mostraba por partes: `print` convierte el DataFrame en texto y, cuando no entra a lo ancho, lo corta en bloques de columnas, lo que dificultaba leerla. Además, nos pareció innecesario recortar columnas. Al volver a preguntarle a Claude, respondió que había elegido solo esas columnas justamente para que la tabla no se cortara al mostrarla, pero igual se seguía cortando.
+
+También notamos que la tabla de "Más declaraciones" usaba `head(9)`. Aunque se entiende que la IA eligió ese número con algún criterio, con 9 filas aun no se alcanzaban a ver donde acaban los empates, y eso debe poder apreciarse para quien corre o lee el código.
 
 **4. ¿Cómo lo corregimos?**
 
-xxx
+Le pedimos que mostrara los datos tal cual, como DataFrame, usando `display` en lugar de `print`, para que el notebook los muestre como tabla completa y sin cortes. Además, le dimo un orden especifico para las columnas para mejor visibilizacion en lugar de generar una lista que recorta variables. También cambiamos el `head` a 10 en ambas tablas, para que se vean todos los empates:
+
+```python
+# Primero ordenamos las columnas (una sola vez)
+resumen = tabla_final[["ubigeo", "departamento", "declaratorias", "prorrogas",
+                       "lluvia_total_mm", "dias_lluvia_fuerte"]]
+
+# 9.1 Los que tienen más declaratorias y los que tienen más lluvia
+print("Más declaratorias:")
+display(resumen.sort_values(["declaratorias", "lluvia_total_mm"], ascending=False).head(10))
+
+print("Más lluvia:")
+display(resumen.sort_values("lluvia_total_mm", ascending=False).head(10))
+```
