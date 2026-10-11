@@ -1,6 +1,6 @@
 # Lluvias y declaratorias de emergencia en el Perú (enero–mayo 2025)
 
-**Dashboard público:** _(pegar aquí el enlace de share.streamlit.io una vez desplegado)_
+**Dashboard público:** _(https://qlabgroup12-bega9ga4ffdhha8fjkjcbe.streamlit.app/)_
 
 ## 1. Pregunta
 Entre enero y mayo de 2025, ¿dónde se declaró estado de emergencia, por qué motivo (lluvias o perturbación del orden interno) y coincide con dónde llovió más?
