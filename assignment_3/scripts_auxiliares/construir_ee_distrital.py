@@ -19,11 +19,14 @@ Lo que NO replica del Rmd: los chunks 4 y 5 (términos y modificatorias), que so
 fin (fecha_final_real) con tablas manuales (modificatorias.xlsx). El dashboard cuenta decretos por fecha de
 promulgación y no usa fechas de fin efectivas, así que no los necesita.
 """
+from pathlib import Path
 import re
 import sys
 import unicodedata
 
 import pandas as pd
+
+DATOS = Path(__file__).resolve().parent.parent / "datos"
 
 BASE_XLSX, CATALOGO = sys.argv[1], sys.argv[2]
 SALIDA_COMPLETA = sys.argv[3] if len(sys.argv) > 3 else None
@@ -169,6 +172,6 @@ w["disposicion"] = w["disposicion"].str.capitalize()
 out = w[["ubigeo", "departamento", "provincia", "distrito", "id_disposicion", "decreto_supremo",
          "fecha_promulgacion", "disposicion", "tipo"]].drop_duplicates()
 out["fecha_promulgacion"] = out["fecha_promulgacion"].dt.date
-out.to_csv("datos/ee_distrital_2025.csv", index=False)
+out.to_csv(DATOS / "ee_distrital_2025.csv", index=False)
 print("\nExtracto del dashboard:", out.shape, out["tipo"].value_counts().to_dict(),
       "| decretos:", out["id_disposicion"].nunique(), "| distritos:", out["ubigeo"].nunique())

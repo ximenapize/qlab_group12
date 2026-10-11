@@ -3,12 +3,15 @@
 Punto de consulta: punto representativo (dentro del polígono) de cada distrito.
 Salida: datos/lluvias_distritos.csv  (ubigeo, latitud, longitud, lluvia_total_mm, dias_lluvia_fuerte, dias_sin_dato)
 """
+from pathlib import Path
 import sys
 import time
 
 import geopandas as gpd
 import pandas as pd
 import requests
+
+DATOS = Path(__file__).resolve().parent.parent / "datos"
 
 INI, FIN, LOTE = "2025-01-01", "2025-05-31", 50
 URL = "https://archive-api.open-meteo.com/v1/archive"
@@ -41,5 +44,5 @@ for i in range(0, len(g), LOTE):
     time.sleep(2)
 
 out = pd.DataFrame(filas)
-out.to_csv("datos/lluvias_distritos.csv", index=False)
+out.to_csv(DATOS / "lluvias_distritos.csv", index=False)
 print(out.describe())

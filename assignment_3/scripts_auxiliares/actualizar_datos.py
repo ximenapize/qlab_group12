@@ -8,7 +8,7 @@ Orden:
 Uso:
   python actualizar_datos.py --base DisposicionesEstadosDeEmergencia.xlsx \\
                              --catalogo catalogo_ubigeo_maestro.csv --shp "ruta/shapefile_distrital.shp" [--sin-lluvia]
-Dependencias: pip install -r requirements-datos.txt
+Dependencias: pip install -r scripts_auxiliares/requirements-datos.txt
 """
 import argparse
 import subprocess
@@ -37,5 +37,5 @@ if not a.sin_lluvia:
 
 for paso in pasos:
     print(f"\n=== {paso[0]} ===", flush=True)
-    subprocess.run([sys.executable, str(AQUI / paso[0]), *paso[1:]], cwd=AQUI, check=True)
-print("\nListo: datos/ actualizado. Ejecuta `streamlit run app.py` para verlo.")
+    subprocess.run([sys.executable, str(AQUI / paso[0]), *paso[1:]], check=True)
+print("\nListo: datos/ actualizado. Ejecuta `streamlit run app.py` desde assignment_3/ para verlo.")
