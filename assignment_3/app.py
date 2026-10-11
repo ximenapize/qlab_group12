@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
 BASE = Path(__file__).parent / "datos"
@@ -102,18 +103,32 @@ tab_mapa, tab_graf, tab_tabla = st.tabs(["Mapa", "Gráficos", "Tabla"])
 with tab_mapa:
     geo = cargar_geojson(nivel)
     sin_poligono = sorted(set(total["unidad"]) - ubigeos_con_poligono(nivel))
+    # Unidades del nivel sin decretos con los filtros actuales (total = 0): se dibujan en gris claro
+    ceros = pd.DataFrame([{"unidad": ft["properties"]["ubigeo"], "nombre": ft["properties"]["nombre"]}
+                          for ft in geo["features"]])
+    ceros = ceros[~ceros["unidad"].isin(total["unidad"])]
     fig_map = px.choropleth_map(
         total, geojson=geo, locations="unidad", featureidkey="properties.ubigeo", color="total",
         hover_name="nombre", hover_data={"unidad": False, "total": True},
-        color_continuous_scale="YlOrRd", map_style="carto-positron", zoom=4.2,
-        center={"lat": -9.2, "lon": -75.0}, opacity=0.8,
+        color_continuous_scale="YlOrRd", range_color=(1, max(2, int(total["total"].max()))),
+        map_style="carto-positron", zoom=4.2, center={"lat": -9.2, "lon": -75.0}, opacity=0.8,
         labels={"total": "Decretos distintos"},
         title=f"Decretos de emergencia por {nombre} (enero–mayo 2025)",
     )
-    fig_map.update_layout(height=650, margin=dict(t=60, r=0, l=0, b=0))
+    GRIS = "#d9d9d9"
+    fig_map.add_trace(go.Choroplethmap(
+        geojson=geo, locations=ceros["unidad"], featureidkey="properties.ubigeo", z=[0] * len(ceros),
+        colorscale=[[0, GRIS], [1, GRIS]], showscale=False, marker_opacity=0.8, marker_line_width=0.2,
+        text=ceros["nombre"], hovertemplate="<b>%{text}</b><br>Sin decretos<extra></extra>"))
+    # Entrada de leyenda para el gris (las coropletas no la generan solas)
+    fig_map.add_trace(go.Scattermap(lat=[None], lon=[None], mode="markers", name="Sin decretos (0)",
+                                    marker=dict(size=14, color=GRIS), showlegend=True))
+    fig_map.update_layout(height=650, margin=dict(t=60, r=0, l=0, b=0),
+                          legend=dict(x=0.01, y=0.02, xanchor="left", yanchor="bottom",
+                                      bgcolor="rgba(255,255,255,0.85)"))
     st.plotly_chart(fig_map, width="stretch")
     if sin_poligono:
-        st.caption(f"{len(sin_poligono)} unidades no se dibujan porque no existen en el mapa base "
+        st.caption(f"{len(sin_poligono)} unidades no se dibujan porque no existen en el mapa base: "
                    f"{', '.join(sin_poligono)}. Sí cuentan en métricas y tabla.")
 
 with tab_graf:

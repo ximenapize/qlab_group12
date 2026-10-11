@@ -16,18 +16,26 @@ SHP = sys.argv[1]
 g = gpd.read_file(SHP).rename(columns={"UBIGEO": "ubigeo"})
 g["ubigeo"] = g["ubigeo"].astype(str).str.zfill(6)
 
-m = g[["ubigeo", "geometry"]].to_crs(32718)
+# Nombres (para el tooltip de las unidades sin decretos)
+for c in ("DEPARTAMEN", "PROVINCIA", "DISTRITO"):
+    g[c] = g[c].str.title()
+g["nombre"] = g["DISTRITO"] + " (" + g["PROVINCIA"] + ")"
+
+m = g[["ubigeo", "nombre", "geometry"]].to_crs(32718)
 m["geometry"] = m.simplify(800)
 m.to_crs(4326).to_file(DATOS / "mapa_distritos.geojson", driver="GeoJSON")
 
-p = g[["ubigeo", "geometry"]].copy()
+p = g[["ubigeo", "PROVINCIA", "DEPARTAMEN", "geometry"]].copy()
 p["ubigeo"] = p["ubigeo"].str[:4]
-p = p.dissolve(by="ubigeo", as_index=False).to_crs(32718)
+p = p.dissolve(by="ubigeo", as_index=False, aggfunc="first")
+p["nombre"] = p["PROVINCIA"] + " (" + p["DEPARTAMEN"] + ")"
+p = p[["ubigeo", "nombre", "geometry"]].to_crs(32718)
 p["geometry"] = p.buffer(100).buffer(-100).simplify(1000)
 p.to_crs(4326).to_file(DATOS / "mapa_provincias.geojson", driver="GeoJSON")
 
-dp = g[["ubigeo", "geometry"]].copy()
+dp = g[["ubigeo", "DEPARTAMEN", "geometry"]].copy()
 dp["ubigeo"] = dp["ubigeo"].str[:2]
-dp = dp.dissolve(by="ubigeo", as_index=False).to_crs(32718)
+dp = dp.dissolve(by="ubigeo", as_index=False, aggfunc="first").rename(columns={"DEPARTAMEN": "nombre"})
+dp = dp.to_crs(32718)
 dp["geometry"] = dp.buffer(100).buffer(-100).simplify(1000)
 dp.to_crs(4326).to_file(DATOS / "departamentos_ubigeo.geojson", driver="GeoJSON")
