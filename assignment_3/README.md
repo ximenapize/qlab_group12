@@ -51,7 +51,6 @@ Alcantara, K., Aragón, J., Cruz, M., Gutiérrez, N., Ilizarbe, C., Pinillos, X.
 - La lluvia distrital se mide en **un solo punto por distrito** (el centro del polígono): distritos grandes o con mucho relieve pueden variar dentro de sí. Es un reanálisis de Open-Meteo (cuadrícula de unos 9–25 km), no una estación.
 - Solo cubre cinco meses de 2025 y cuenta decretos por distrito, no su magnitud ni sus daños.
 - Un mismo decreto cubre muchos distritos, así que la cantidad de distritos no equivale a la de decretos.
-- Los nombres de la base vienen sin tildes.
 
 ## Cómo ejecutarlo en local
 ```bash
